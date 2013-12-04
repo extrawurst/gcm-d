@@ -2,6 +2,7 @@ module gcm.gcm;
 
 import vibe.core.log;
 import vibe.http.client;
+import vibe.stream.operations;
 
 import vibe.data.json;
 
@@ -46,16 +47,19 @@ struct GCMRequest
 struct GCMResponse
 {
 	///Unique ID (number) identifying the multicast message.
-	int multicast_id;
+	long multicast_id;
 
 	///Number of messages that were processed without an error.
-	int success;
+	long success;
 
 	///Number of messages that could not be processed.
-	int failure;
+	long failure;
 
 	///Number of results that contain a canonical registration ID. See Advanced Topics for more discussion of this topic.
-	int canonical_ids;
+	long canonical_ids;
+
+	///
+	Json results;
 }
 
 /// wrapper class
@@ -79,7 +83,7 @@ public:
 		requestHTTP("https://android.googleapis.com/gcm/send",
 					(scope req) {
 						req.method = HTTPMethod.POST;
-						
+
 						req.headers["Authorization"] = "key=" ~ m_apikey;
 						req.headers["Content-Type"] = "application/json";
 
@@ -87,16 +91,37 @@ public:
 
 						req.writeJsonBody(_req.toJson());
 					},
-					(scope res) {
+					(scope HTTPClientResponse res) {
 						logInfo("Response: %d", res.statusCode);
 
 						statusCode = res.statusCode;
 
 						foreach (k, v; res.headers)
 							logInfo("Header: %s: %s", k, v);
+
+						if(statusCode == 200)
+							parseSuccessResult(res.readJson(), _res);
+						else
+							logInfo("response: %s", cast(string)res.bodyReader.readAll());
 					}
 		);
 
 		return statusCode;
+	}
+
+private:
+
+	static void parseSuccessResult(Json _body, ref GCMResponse _res)
+	{
+		_res.multicast_id = _body.multicast_id.get!long;
+
+		_res.canonical_ids = _body.canonical_ids.get!long;
+
+		_res.failure = _body.failure.get!long;
+		_res.success = _body.success.get!long;
+
+		_res.results = _body.results;
+
+		logInfo("response: %s", _res);
 	}
 }

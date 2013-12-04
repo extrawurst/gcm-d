@@ -1,7 +1,9 @@
 
 import gcm.gcm;
 
-void main()
+import vibe.d;
+
+shared static this()
 {
 	auto gcm = new GCM("api key");
 
