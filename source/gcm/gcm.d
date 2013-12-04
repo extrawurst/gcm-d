@@ -87,17 +87,17 @@ public:
 						req.headers["Authorization"] = "key=" ~ m_apikey;
 						req.headers["Content-Type"] = "application/json";
 
-						logInfo("body: %s",_req.toJson().toString);
+						//logInfo("body: %s",_req.toJson().toString);
 
 						req.writeJsonBody(_req.toJson());
 					},
 					(scope HTTPClientResponse res) {
-						logInfo("Response: %d", res.statusCode);
+						//logInfo("Response: %d", res.statusCode);
 
 						statusCode = res.statusCode;
 
-						foreach (k, v; res.headers)
-							logInfo("Header: %s: %s", k, v);
+						//foreach (k, v; res.headers)
+						//	logInfo("Header: %s: %s", k, v);
 
 						if(statusCode == 200)
 							parseSuccessResult(res.readJson(), _res);
@@ -121,7 +121,5 @@ private:
 		_res.success = _body.success.get!long;
 
 		_res.results = _body.results;
-
-		logInfo("response: %s", _res);
 	}
 }

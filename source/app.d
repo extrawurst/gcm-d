@@ -15,4 +15,6 @@ shared static this()
 
 	GCMResponse response;
 	gcm.request(request,response);
+
+	logInfo("response: %s",response);
 }
