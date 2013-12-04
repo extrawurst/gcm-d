@@ -149,3 +149,15 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+.dub/
+gcm-d.sln
+gcm-d.visualdproj
+gcm-d_d.exe
+gcm-d_d.exe_cv
+libeay32.dll
+libevent.dll
+libevent.visualdproj
+openssl.visualdproj
+package.userprefs
+ssleay32.dll
+vibe-d.visualdproj

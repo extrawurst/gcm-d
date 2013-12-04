@@ -1,0 +1,10 @@
+{
+	"name": "gcm-d",
+	"license": "MIT",
+	"description": "Google Cloud Messaging (GCM) for D (using vibe.d)",
+	"copyright": "Copyright © 2013, Stephan Dilly",
+	"authors": ["Stephan Dilly"],
+	"dependencies": {
+		"vibe-d": ">=0.7.18"
+	}
+}
