@@ -3,7 +3,7 @@ import gcm.gcm;
 
 void main()
 {
-	auto gcm = new GCM("AIzaSyCxwnHC-ZL1DKurSAcSQfC3rH5M6q4V9UQ");
+	auto gcm = new GCM("api key");
 
 	auto request = GCMRequest();
 	
