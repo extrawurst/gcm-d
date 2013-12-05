@@ -11,7 +11,7 @@ shared static this()
 	
 	request.dry_run = true;
 	
-	request.registration_ids ~= 42;
+	request.registration_ids ~= "reg id of target device";
 
 	GCMResponse response;
 	gcm.request(request,response);

@@ -10,7 +10,7 @@ import vibe.data.json;
 struct GCMRequest
 {
 	///A string array with the list of devices (registration IDs) receiving the message
-	int[] registration_ids;
+	string[] registration_ids;
 
 	///A string that maps a single user to multiple registration IDs associated with that user.
 	string notification_key;
