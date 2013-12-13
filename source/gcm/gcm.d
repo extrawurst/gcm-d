@@ -25,7 +25,7 @@ struct GCMRequest
 	bool delay_while_idle;
 
 	///How long (in seconds) the message should be kept on GCM storage if the device is offline
-	int time_to_live;
+	int time_to_live = -1;
 
 	///A string containing the package name of your application
 	string restricted_package_name;
@@ -48,7 +48,7 @@ struct GCMRequest
 		if(delay_while_idle)
 			result.delay_while_idle = true;
 
-		if(time_to_live != 0)
+		if(time_to_live > -1)
 			result.time_to_live = time_to_live;
 
 		if(collapse_key.length > 0)
