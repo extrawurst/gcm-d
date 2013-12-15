@@ -79,9 +79,22 @@ struct GCMResponse
 
 	///
 	Json results;
+
+	/// parsed errors from result, helps matching up errors to regIds
+	GCMResponseError[] errors;
 }
 
-/// wrapper class
+/// matches error responses to the correct regId
+struct GCMResponseError
+{
+	/// corresponding registration id triggering the error
+	string regId;
+
+	/// see http://developer.android.com/google/gcm/http.html#error_codes
+	string type;
+}
+
+///
 class GCM
 {
 	private string m_apikey;
@@ -99,7 +112,7 @@ public:
 	{
 		int statusCode;
 
-		requestHTTP("https://android.googleapis.com/gcm/send",
+		try requestHTTP("https://android.googleapis.com/gcm/send",
 					(scope req) {
 						req.method = HTTPMethod.POST;
 
@@ -119,18 +132,22 @@ public:
 						//	logInfo("Header: %s: %s", k, v);
 
 						if(statusCode == 200)
-							parseSuccessResult(res.readJson(), _res);
+							parseSuccessResult(res.readJson(), _req, _res);
 						else
 							logInfo("response: %s", cast(string)res.bodyReader.readAll());
 					}
 		);
+		catch(Exception e)
+		{
+			logError("[gmc] request failed: %s",e);
+		}
 
 		return statusCode;
 	}
 
 private:
 
-	static void parseSuccessResult(Json _body, ref GCMResponse _res)
+	static void parseSuccessResult(Json _body, in GCMRequest _req, ref GCMResponse _res)
 	{
 		_res.multicast_id = _body.multicast_id.get!long;
 
@@ -140,5 +157,27 @@ private:
 		_res.success = _body.success.get!long;
 
 		_res.results = _body.results;
+
+		_res.errors.length = cast(uint)_res.failure;
+		_res.errors.length = 0;
+
+		if(_res.failure > 0)
+		{
+			int idx=0;
+			foreach(resultEntry; _body.results)
+			{
+				if("error" in resultEntry)
+				{
+					GCMResponseError err;
+
+					err.regId = _req.registration_ids[idx];
+					err.type = resultEntry.error.get!string;
+
+					_res.errors ~= err;
+				}
+
+				idx++;
+			}
+		}
 	}
 }
