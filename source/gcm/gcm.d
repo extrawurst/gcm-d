@@ -65,6 +65,9 @@ struct GCMRequest
 /// see http://developer.android.com/google/gcm/http.html
 struct GCMResponse
 {
+	/// see http://developer.android.com/google/gcm/http.html#response
+	int statusCode;
+
 	///Unique ID (number) identifying the multicast message.
 	long multicast_id;
 
@@ -108,9 +111,9 @@ public:
 	}
 
 	///
-	int request(GCMRequest _req, ref GCMResponse _res)
+	bool request(GCMRequest _req, ref GCMResponse _res)
 	{
-		int statusCode;
+		_res.statusCode = 0;
 
 		try requestHTTP("https://android.googleapis.com/gcm/send",
 					(scope req) {
@@ -124,14 +127,10 @@ public:
 						req.writeJsonBody(_req.toJson());
 					},
 					(scope HTTPClientResponse res) {
-						//logInfo("Response: %d", res.statusCode);
 
-						statusCode = res.statusCode;
+						_res.statusCode = res.statusCode;
 
-						//foreach (k, v; res.headers)
-						//	logInfo("Header: %s: %s", k, v);
-
-						if(statusCode == 200)
+						if(res.statusCode == 200)
 							parseSuccessResult(res.readJson(), _req, _res);
 						else
 							logInfo("response: %s", cast(string)res.bodyReader.readAll());
@@ -142,7 +141,7 @@ public:
 			logError("[gmc] request failed: %s",e);
 		}
 
-		return statusCode;
+		return _res.statusCode == 200;
 	}
 
 private:
