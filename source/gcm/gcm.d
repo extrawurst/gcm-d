@@ -37,26 +37,26 @@ struct GCMRequest
 	{
 		Json result = Json.emptyObject;
 
-		result.registration_ids = serializeToJson(registration_ids);
+		result["registration_ids"] = serializeToJson(registration_ids);
 
 		if(data.type != Json.undefined)
-			result.data = data;
+			result["data"] = data;
 
 		if(dry_run)
-			result.dry_run = true;
+			result["dry_run"] = true;
 
 		if(delay_while_idle)
-			result.delay_while_idle = true;
+			result["delay_while_idle"] = true;
 
 		if(time_to_live > -1)
-			result.time_to_live = time_to_live;
+			result["time_to_live"] = time_to_live;
 
 		if(collapse_key.length > 0)
-			result.collapse_key = collapse_key;
+			result["collapse_key"] = collapse_key;
 		if(restricted_package_name.length > 0)
-			result.restricted_package_name = restricted_package_name;
+			result["restricted_package_name"] = restricted_package_name;
 		if(notification_key.length > 0)
-			result.notification_key = notification_key;
+			result["notification_key"] = notification_key;
 
 		return result;
 	}
@@ -148,14 +148,14 @@ private:
 
 	static void parseSuccessResult(Json _body, in GCMRequest _req, ref GCMResponse _res)
 	{
-		_res.multicast_id = _body.multicast_id.get!long;
+		_res.multicast_id = _body["multicast_id"].get!long;
 
-		_res.canonical_ids = _body.canonical_ids.get!long;
+		_res.canonical_ids = _body["canonical_ids"].get!long;
 
-		_res.failure = _body.failure.get!long;
-		_res.success = _body.success.get!long;
+		_res.failure = _body["failure"].get!long;
+		_res.success = _body["success"].get!long;
 
-		_res.results = _body.results;
+		_res.results = _body["results"];
 
 		_res.errors.length = cast(uint)_res.failure;
 		_res.errors.length = 0;
@@ -163,14 +163,14 @@ private:
 		if(_res.failure > 0)
 		{
 			int idx=0;
-			foreach(resultEntry; _body.results)
+			foreach(resultEntry; _body["results"])
 			{
 				if("error" in resultEntry)
 				{
 					GCMResponseError err;
 
 					err.regId = _req.registration_ids[idx];
-					err.type = resultEntry.error.get!string;
+					err.type = resultEntry["error"].get!string;
 
 					_res.errors ~= err;
 				}
